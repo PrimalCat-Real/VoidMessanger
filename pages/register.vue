@@ -58,8 +58,10 @@ export default {
 
             // Serialize and store the private key in local storage
             localStorage.setItem('privateKey', JSON.stringify(this.privateKey));
+            const publicUsername = data.username
 
             const serializedKeyR = localStorage.getItem('privateKey');
+            localStorage.setItem('username', JSON.stringify(publicUsername));
             if (serializedKeyR) {
               // Deserialize the private key
               console.log(JSON.parse(serializedKeyR));

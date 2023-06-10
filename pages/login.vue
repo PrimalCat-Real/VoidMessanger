@@ -53,6 +53,11 @@ export default {
             console.log(data);
             this.token = data.token
             this.publicKey = data.publicKey
+            const publicUsername = data.username
+            localStorage.setItem('token', JSON.stringify(this.token));
+            localStorage.setItem('publicKey', JSON.stringify(this.publicKey));
+            localStorage.setItem('username', JSON.stringify(publicUsername));
+
           })
           .catch(error => {
             // Handle any errors
