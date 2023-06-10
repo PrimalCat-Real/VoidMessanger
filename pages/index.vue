@@ -49,10 +49,19 @@ export default {
         return{
             messages: [],
             inputValue: null,
+            reciverName: "den",
+            reciverPublicKey: null
             // rsaKey: new NodeRSA()
         }
     },
     mounted(){
+        fetch('https://octopus-app-l4b7l.ondigitalocean.app/publicKey/' + this.reciverName,{
+            method: 'GET',
+        }).then(response => response.json()).then(data => {
+            this.reciverPublicKey = data
+            console.log(data);
+        })
+        // alert(this.reciverPublicKey);
         const fetchData = async () => {
             try {
                 const publicKey = localStorage.getItem('publicKey');
@@ -98,6 +107,7 @@ export default {
             const serializedKey = localStorage.getItem('privateKey');
             const serializedToken = localStorage.getItem('token');
             const publicKey = localStorage.getItem('publicKey');
+            const username = localStorage.getItem('username');
             const algorithm = 'aes-256-cbc';
             if(this.inputValue){
                  const cryptedMsg = this.encodeMessage(JSON.parse(publicKey), this.inputValue )
