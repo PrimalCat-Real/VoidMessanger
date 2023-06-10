@@ -24,12 +24,18 @@ definePageMeta({
 </template>
 
 <script>
+import { root } from 'postcss';
 export default {
   data() {
     return {
       username: null,
       password: null,
+      privateKey: null,
+      errors: null,
     }
+  },
+  setup(){
+    
   },
   methods: {
     registerSend() {
@@ -47,12 +53,30 @@ export default {
           .then(response => response.json())
           .then(data => {
             // Handle the response data
-            console.log(data);
+            console.log(data.privateKey);
+            this.privateKey = data.privateKey
+
+            // Serialize and store the private key in local storage
+            localStorage.setItem('privateKey', JSON.stringify(this.privateKey));
+
+            const serializedKeyR = localStorage.getItem('privateKey');
+            if (serializedKeyR) {
+              // Deserialize the private key
+              console.log(JSON.parse(serializedKeyR));
+            }
+            this.errors = null
+            // router.push("test/");
           })
           .catch(error => {
             // Handle any errors
+            this.errors = error
             console.error(error);
+            alert("Error")
           });
+      }
+      if(this.errors == null){
+        const router = useRouter();
+        router.push("/")
       }
     },
     validateForm() {

@@ -29,6 +29,9 @@ export default {
     return {
       username: null,
       password: null,
+      token: null,
+      publicKey: null,
+      errors: null,
     }
   },
   methods: {
@@ -48,11 +51,18 @@ export default {
           .then(data => {
             // Handle the response data
             console.log(data);
+            this.token = data.token
+            this.publicKey = data.publicKey
           })
           .catch(error => {
             // Handle any errors
             console.error(error);
+            this.errors = error
           });
+      }
+      if(this.errors == null){
+        const router = useRouter();
+        router.push("/")
       }
     },
     validateForm() {
