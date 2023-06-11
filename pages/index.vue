@@ -49,7 +49,7 @@ export default {
         return{
             messages: [],
             inputValue: null,
-            reciverName: "den",
+            reciverName: "new_user",
             reciverPublicKey: null
             // rsaKey: new NodeRSA()
         }
@@ -58,7 +58,7 @@ export default {
         fetch('https://octopus-app-l4b7l.ondigitalocean.app/publicKey/' + this.reciverName,{
             method: 'GET',
         }).then(response => response.json()).then(data => {
-            this.reciverPublicKey = data
+            this.reciverPublicKey = data.publicKey
             console.log(data);
         })
         // alert(this.reciverPublicKey);
@@ -75,9 +75,18 @@ export default {
                 this.messages = response.data?.value
                 let decodedArray = []
                 for (let index = 0; index < this.messages?.length; index++) {
-                    let temp = this.decodeMessage(JSON.parse(publicKey), this.messages[index].message)
-                    if(temp){
-                        decodedArray.push({"text":temp, "isWatched": false, "isSended": true, "inMessage": this.messages[index].receiver == "new_user2", "sender": this.messages[index].sender, "receiver": this.messages[index].receiver})
+                    // let temp
+                    // if(this.messages[index].reciverName == this.reciverName){
+                    //     console.log(this.decodeMessage(this.reciverPublicKey, this.messages[index].message));
+                    // }else{
+                    //     // temp = this.decodeMessage(JSON.parse(publicKey), this.messages[index].message)
+                    // }
+                //    alert(this.reciverName)
+                    console.log(this.decodeMessage(this.reciverPublicKey, this.messages[index].message));
+                    if(this.messages[index].receiver == this.reciverName){
+                        decodedArray.push({"text": this.decodeMessage(this.reciverPublicKey, this.messages[index].message), "isWatched": false, "isSended": true, "inMessage": this.messages[index].receiver == "new_user2", "sender": this.messages[index].sender, "receiver": this.messages[index].receiver})
+                    }else{
+                        decodedArray.push({"text": this.decodeMessage(JSON.parse(publicKey), this.messages[index].message), "isWatched": false, "isSended": true, "inMessage": this.messages[index].receiver == "new_user2", "sender": this.messages[index].sender, "receiver": this.messages[index].receiver})
                     }
                     // const element = array[index];
                 }
@@ -96,7 +105,7 @@ export default {
         fetchData();
 
             // Set up the interval to execute fetchData every 1 second (adjust as needed)
-        setInterval(fetchData, 1000);
+        setInterval(fetchData, 2000);
         // this.$once("hook:beforeDestroy", () => {
         // // Clean up the interval when the component is unmounted
         //     clearInterval(intervalId);
@@ -110,7 +119,7 @@ export default {
             const username = localStorage.getItem('username');
             const algorithm = 'aes-256-cbc';
             if(this.inputValue){
-                 const cryptedMsg = this.encodeMessage(JSON.parse(publicKey), this.inputValue )
+                 const cryptedMsg = this.encodeMessage(this.reciverPublicKey, this.inputValue )
             // console.log(encodeMessage(JSON.parse(publicKey), "test"));
             // const decryptedMsg = this.decodeMessage(JSON.parse(publicKey), "U2FsdGVkX191GzGIkokwht52Bi/0+d4TW81sLmsS7U4=")
 
@@ -122,7 +131,7 @@ export default {
                         'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token'))
                     },
                     body: JSON.stringify({
-                        receiver: "den",
+                        receiver: this.reciverName,
                         message: cryptedMsg
                     })
                 }).then(response => response.json()).then(data => {
