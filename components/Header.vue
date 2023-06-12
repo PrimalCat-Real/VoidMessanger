@@ -1,5 +1,5 @@
 <template>
-  <div class="header w-full h-12 flex-auto bg-dark-400 flex flex-col items-center">
+  <div class="header w-full max-h-12 h-12 flex-auto bg-dark-400 flex flex-col items-center">
     <div class="wrapper flex w-1/2 lg:w-3/4 sm:w-full sm:px-5 h-full items-center">
         <div class="text flex items-center gap-4">
             <img class="h-9 w-9" src="@/assets/avatar.png" alt="">
@@ -20,7 +20,7 @@ export default {
     return {
       lastSeeTime: null,
       store: useProfileStore(),
-      username: "new_user2"
+      username: "cataction2"
     }
   },
   mounted(){
@@ -41,9 +41,9 @@ export default {
       const date1 = new Date(this.lastSeeTime);
       const date2 = new Date();
       const timeDifference = date2.getTime() - date1.getTime();
-      if (timeDifference === 60000) {
-          console.log("Last seen:", date1.getTime());
-          return "Last seen: " + date1.getTime()
+      if (timeDifference >= 60000) {
+          console.log("Last seen", date1.getTime());
+          return "Last seen " + date1.toLocaleString("en-US", {hour: "numeric", minute: "numeric", hour12: true,}) + " " + date1.toLocaleString("en-US", { month: "short", day: 'numeric', year: "numeric"})
       } else if (date1 < date2) {
           console.log("Online");
           return "Online"

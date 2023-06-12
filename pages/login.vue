@@ -14,12 +14,12 @@ definePageMeta({
       <h1 class="text-light-default">Void</h1>
       <h2 class="w-3/4 text-light-200 mb-6">Wellcome Back, login!</h2>
     </div>
-    <div class="wrapper text-center flex items-center flex-col mb-24 gap-5 w-1/4 xl:w-1/3 lg:w-2/3 sm:w-full">
+    <form  @submit.prevent="loginSend" class="wrapper text-center flex items-center flex-col mb-24 gap-5 w-1/4 xl:w-1/3 lg:w-2/3 sm:w-full">
       <input v-model="username" type="text" placeholder="Username"  class="h-10 w-3/4 placeholder:text-sm rounded-lg px-3 py-1 outline-none border-[1.5px] !text-light-default border-light-600 focus:border-main-default active:border-main-default  hover:border-main-default transition-colors duration-200 bg-transparent">
       <input v-model="password" type="password" placeholder="Password" class="h-10 w-3/4 placeholder:text-sm rounded-lg px-3 py-1 outline-none border-[1.5px] !text-light-default border-light-600 focus:border-main-default active:border-main-default  hover:border-main-default transition-colors duration-200  bg-transparent">
-      <button @click.prevent="loginSend" @submit="loginSend" type="submit" class="h-10 w-3/4 outline-none hover:text-light-default bg-light-default rounded-lg px-3 py-1 outline-1 text-dark-400 focus:none  hover:bg-main-default text-lg transition-colors duration-200 font-medium">Login</button>
+      <button @click.prevent="loginSend"  type="submit" class="h-10 w-3/4 outline-none hover:text-light-default bg-light-default rounded-lg px-3 py-1 outline-1 text-dark-400 focus:none  hover:bg-main-default text-lg transition-colors duration-200 font-medium">Login</button>
        <h1 class="text-light-200 mb-2">Don't have account? <span @click.prevent=" useRouter().push('/register')" class="text-main-default cursor-pointer font-semibold">Sign Up</span></h1>
-    </div>
+    </form>
     
   </div>
 </template>
