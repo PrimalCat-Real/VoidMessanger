@@ -27,8 +27,9 @@
         </button>
     </div>
     <div class="page w-1/2 lg:w-3/4 sm:w-full sm:px-5">
-    <Message v-for="message in messages" :key="message" :inMessage="message.inMessage" :isSended="true">
+    <Message v-for="message in messages" :time="message.time" :key="message" :inMessage="message.inMessage" :isSended="true">
         <h1>{{message.text}}</h1>     
+        <!-- <h2>{{message.time}}</h2> -->
     </Message>
     </div>
     
@@ -86,11 +87,11 @@ export default {
                     //     // temp = this.decodeMessage(JSON.parse(publicKey), this.messages[index].message)
                     // }
                 //    alert(this.reciverName)
-                    console.log(this.decodeMessage(this.reciverPublicKey, this.messages[index].message));
+                    console.log(new Date().getTimezoneOffset() * 60 * 1000);
                     if(this.messages[index].receiver == this.reciverName){
-                        decodedArray.push({"text": this.decodeMessage(this.reciverPublicKey, this.messages[index].message), "isWatched": false, "isSended": true, "inMessage": this.messages[index].receiver == "new_user2", "sender": this.messages[index].sender, "receiver": this.messages[index].receiver})
+                        decodedArray.push({"text": this.decodeMessage(this.reciverPublicKey, this.messages[index].message), "time": new Date(parseInt(this.messages[index].time) + new Date().getTimezoneOffset() * 60 * 1000).toLocaleString("en-US", { month: "short", day: 'numeric', hour: "numeric", minute: "numeric", hour12: true,}), "isWatched": false, "isSended": true, "inMessage": this.messages[index].receiver == "new_user2", "sender": this.messages[index].sender, "receiver": this.messages[index].receiver})
                     }else{
-                        decodedArray.push({"text": this.decodeMessage(JSON.parse(publicKey), this.messages[index].message), "isWatched": false, "isSended": true, "inMessage": this.messages[index].receiver == "new_user2", "sender": this.messages[index].sender, "receiver": this.messages[index].receiver})
+                        decodedArray.push({"text": this.decodeMessage(JSON.parse(publicKey), this.messages[index].message), "time": new Date(parseInt(this.messages[index].time) + new Date().getTimezoneOffset() * 60 * 1000), "isWatched": false, "isSended": true, "inMessage": this.messages[index].receiver == "new_user2", "sender": this.messages[index].sender, "receiver": this.messages[index].receiver})
                     }
                     // const element = array[index];
                 }

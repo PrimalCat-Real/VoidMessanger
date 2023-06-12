@@ -4,7 +4,7 @@
         <slot>
         </slot>
          <div class="wrapper h-full flex items-end gap-2">
-            <h2 class="text-[12px] ">12:00 PM</h2>
+            <h2 class="text-[12px] ">{{time}}</h2>
         </div>
     </div>
     <div class="wrapper flex items-end h-full">
@@ -17,7 +17,11 @@
 
 <script>
 export default {
-
+props: {
+    time: {
+        default: "12:00 Pm",
+    }
+  }
 }
 </script>
 
