@@ -24,11 +24,16 @@ export default {
     }
   },
   mounted(){
-    fetch('https://octopus-app-l4b7l.ondigitalocean.app/profile/' + this.username,{
+    const fetchData = async () => {
+      fetch('https://octopus-app-l4b7l.ondigitalocean.app/profile/' + this.username,{
             method: 'GET',
         }).then(response => response.json()).then(data => {
             this.lastSeeTime = data.lastTimeOnline;
       })
+    }
+    
+    fetchData()
+    setInterval(fetchData, 10000);
   },
   computed: {
     onlineStatus() {
