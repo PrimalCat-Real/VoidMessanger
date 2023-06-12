@@ -17,7 +17,8 @@ definePageMeta({
     <div class="wrapper text-center flex items-center flex-col mb-24 gap-5 w-1/4 xl:w-1/3 lg:w-2/3 sm:w-full">
       <input v-model="username" type="text" placeholder="Username"  class="h-10 w-3/4 placeholder:text-sm rounded-lg px-3 py-1 outline-none border-[1.5px] !text-light-default border-light-600 focus:border-main-default active:border-main-default  hover:border-main-default transition-colors duration-200 bg-transparent">
       <input v-model="password" type="password" placeholder="Password" class="h-10 w-3/4 placeholder:text-sm rounded-lg px-3 py-1 outline-none border-[1.5px] !text-light-default border-light-600 focus:border-main-default active:border-main-default  hover:border-main-default transition-colors duration-200  bg-transparent">
-      <button @click.prevent="registerSend" @submit="registerSend" type="submit"  class="mb-2 h-10 w-3/4 hover:text-light-default bg-light-600 rounded-lg px-3 py-1 outline-1 text-dark-400 hover:bg-main-default text-lg transition-colors duration-200 font-medium">Register</button>
+      <button @click.prevent="registerSend" @submit="registerSend" type="submit"  class=" h-10 w-3/4 hover:text-light-default bg-light-default rounded-lg px-3 py-1 outline-1 text-dark-400 hover:bg-main-default text-lg transition-colors duration-200 font-medium">Register</button>
+      <h1 class="text-light-200 mb-2">Have account? <span @click.prevent=" useRouter().push('/login')" class="text-main-default cursor-pointer font-semibold">Log In</span></h1>
     </div>
     
   </div>
