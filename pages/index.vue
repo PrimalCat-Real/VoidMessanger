@@ -48,22 +48,27 @@ definePageMeta({
 
 <script>
 import { AES, enc } from 'crypto-js';
-
+import { useProfileStore } from '~/stores/ProfileStore';
 export default {
     data(){
         return{
             messages: [],
             inputValue: null,
             reciverName: "new_user",
-            reciverPublicKey: null
+            reciverPublicKey: null,
+            lastSeeTime: 1686595509368,
+            isOnline: "Online",
+            store: useProfileStore(),
             // rsaKey: new NodeRSA()
         }
     },
     mounted(){
+        
         fetch('https://octopus-app-l4b7l.ondigitalocean.app/publicKey/' + this.reciverName,{
             method: 'GET',
         }).then(response => response.json()).then(data => {
             this.reciverPublicKey = data.publicKey
+            this.store.setUsername(this.username)
             console.log(data);
         })
         // alert(this.reciverPublicKey);
