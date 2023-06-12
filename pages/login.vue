@@ -25,6 +25,7 @@ definePageMeta({
 </template>
 
 <script>
+import { useTokenStore } from '~/stores/TokenStore';
 export default {
   data() {
     return {
@@ -33,6 +34,7 @@ export default {
       token: null,
       publicKey: null,
       errors: null,
+      store: useTokenStore(),
     }
   },
   methods: {
@@ -55,10 +57,14 @@ export default {
             this.token = data.token
             this.publicKey = data.publicKey
             const publicUsername = data.username
+            
             localStorage.setItem('token', JSON.stringify(this.token));
             localStorage.setItem('publicKey', JSON.stringify(this.publicKey));
             localStorage.setItem('username', JSON.stringify(publicUsername));
 
+            this.store.setAuthToken(this.token)
+            const router = useRouter();
+            router.push("/")
           })
           .catch(error => {
             // Handle any errors
@@ -66,10 +72,11 @@ export default {
             this.errors = error
           });
       }
-      if(this.errors == null){
-        const router = useRouter();
-        router.push("/")
-      }
+      // if(this.errors == null){
+        // this.store.setAuthToken(this.token)
+        // const router = useRouter();
+        // router.push("/")
+      // }
     },
     validateForm() {
       if (!this.username || !this.password) {

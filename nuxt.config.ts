@@ -6,6 +6,7 @@ export default defineNuxtConfig({
     modules: [
         '@nuxtjs/tailwindcss',
         '@nuxtjs/google-fonts',
+        '@pinia/nuxt',
     ],
     googleFonts: {
         preconnect: true,
