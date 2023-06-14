@@ -80,12 +80,14 @@ export default {
         const response = await fetch('https://octopus-app-l4b7l.ondigitalocean.app/profile/' + this.searchUserInput, {
           method: 'GET',
         });
+       
        if (response.ok) {
-          const data = await response.json();
+           const data = await response.json();
+          this.lastSeeTime = data.lastTimeOnline;
           // if (!this.userList.find(data)) {
           //   this.userList.push(data);
           // }
-          this.lastSeeTime = data.lastTimeOnline;
+          
           this.userList.push(data?.username);
           this.store.getUserList().push(data);
           this.store.setReciver(this.searchUserInput)
@@ -100,6 +102,11 @@ export default {
       }
     },
     changeReciver(reciver){
+       fetch('https://octopus-app-l4b7l.ondigitalocean.app/profile/' + reciver,{
+            method: 'GET',
+        }).then(response => response.json()).then(data => {
+            this.lastSeeTime = data.lastTimeOnline
+        })
       this.store.setReciver(reciver)
     }
   },
@@ -109,7 +116,7 @@ export default {
       const date1 = new Date(this.lastSeeTime);
       const date2 = new Date();
       const timeDifference = date2.getTime() - date1.getTime();
-      if(this.username.length > 0){
+      if(this.username.length > 0 && this.store.getReciver() != null){
         if (timeDifference >= 60000) {
           console.log("Last seen", date1.getTime());
           return "Last seen " + date1.toLocaleString("en-US", {hour: "numeric", minute: "numeric", hour12: true,}) + " " + date1.toLocaleString("en-US", { month: "short", day: 'numeric', year: "numeric"})
