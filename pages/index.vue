@@ -1,4 +1,12 @@
 <template>
+    <div v-if="toastStore.getIsActive()" class="toast absolute right-10 top-20 min-w-[200px] w-fit h-10 bg-red-600 flex items-center justify-between">
+    <h1 class="text-light-default mx-4">{{toastStore.getToastContent()}}</h1>
+    <button @click="toastStore.setIsActive(false)" class="h-10 w-10 bg-red-800 flex items-center justify-center fill-light-200 hover:fill-light-default duration-200 transition-colors">
+        <svg width="15" height="14" viewBox="0 0 15 14" xmlns="http://www.w3.org/2000/svg">
+        <path d="M12.3047 0.289062C12.4922 0.101562 12.7266 0.0078125 13.0078 0.0078125C13.2891 0.0078125 13.5234 0.101562 13.7109 0.289062C13.9141 0.492188 14.0156 0.730469 14.0156 1.00391C14.0156 1.27734 13.9141 1.51562 13.7109 1.71875L8.41406 6.99219L13.7109 12.2891C13.9141 12.4922 14.0156 12.7305 14.0156 13.0039C14.0156 13.2773 13.9141 13.5156 13.7109 13.7188C13.5234 13.9062 13.2891 14 13.0078 14C12.7266 14 12.4922 13.9062 12.3047 13.7188L7.00781 8.42188L1.71094 13.7188C1.52344 13.9062 1.28906 14 1.00781 14C0.726562 14 0.492188 13.9062 0.304688 13.7188C0.101562 13.5156 0 13.2773 0 13.0039C0 12.7305 0.101562 12.4922 0.304688 12.2891L5.60156 6.99219L0.304688 1.71875C0.101562 1.51562 0 1.27734 0 1.00391C0 0.730469 0.101562 0.492188 0.304688 0.289062C0.492188 0.101562 0.726562 0.0078125 1.00781 0.0078125C1.28906 0.0078125 1.52344 0.101562 1.71094 0.289062L7.00781 5.58594L12.3047 0.289062Z" class="fill-inherit"/>
+        </svg>
+    </button>
+    </div>
   <div class="w-full flex-1 flex-col h-full overflow-hidden items-center flex gap-5">
     <!-- input bar -->
     <div class="input-wrapper w-1/2 lg:w-3/4 sm:w-full sm:px-5 absolute bottom-6 items-end left-1/2 flex -translate-x-1/2 ">
@@ -33,7 +41,7 @@
     </Message>
     
     </div>
-    <div class="spacer h-36"></div>
+    <div class="spacer h-40"></div>
   </div>
 </template>
 
@@ -50,23 +58,25 @@ definePageMeta({
 <script>
 import { AES, enc } from 'crypto-js';
 import { useProfileStore } from '~/stores/ProfileStore';
+import { useToastStore } from '~/stores/ToastStore';
 export default {
     data(){
         return{
             messages: [],
             inputValue: null,
-            reciverName: "cataction2",
+            reciverName: "ki_2",
             reciverPublicKey: null,
             lastSeeTime: 1686595509368,
             isOnline: "Online",
             store: useProfileStore(),
-            username: ""
+            toastStore: useToastStore(),
+            username: 'new_user2'
             // rsaKey: new NodeRSA()
         }
     },
     mounted(){
-        this.username = localStorage.getItem('username');
-        fetch('https://octopus-app-l4b7l.ondigitalocean.app/publicKey/' + this.reciverName,{
+        // this.username = localStorage.getItem('username');
+        fetch('https://octopus-app-l4b7l.ondigitalocean.app/publicKey/' + this.store.getReciver(),{
             method: 'GET',
         }).then(response => response.json()).then(data => {
             this.reciverPublicKey = data.publicKey
@@ -76,6 +86,7 @@ export default {
         // alert(this.reciverPublicKey);
         const fetchData = async () => {
             try {
+                
                 const publicKey = localStorage.getItem('publicKey');
                 const response = await useFetch('https://octopus-app-l4b7l.ondigitalocean.app/messages', {
                 method: 'GET',
@@ -85,8 +96,38 @@ export default {
                 },
                 });
                 this.messages = response.data?.value
+                console.log("pk",publicKey);
+                console.log("msg",this.messages);
+                const usernames = this.messages
+                    .filter(item => item.username === "new_user2" || item.messages.some(msg => msg.sender === "new_user2"))
+                    .map(item => {
+                        this.store.pushUser(item.username)
+                        })
+
+               
+                console.log(usernames);
                 let decodedArray = []
-                for (let index = 0; index < this.messages?.length; index++) {
+                const userMessages = this.messages?.find(item => item.username === this.store.getReciver())?.messages;
+                // console.log(userMessages);
+                // console.log(userMessages);
+                // const username = "ki_2";
+                // const uMessages = [];
+
+                // this.messages.forEach(item => {
+                // if (item.username === username) {
+                //     item.messages.forEach(message => {
+                //     uMessages.push(message);
+                //     });
+                // } else if (item.sender === username || item.receiver === username) {
+                //     uMessages.push(item);
+                // }
+                // });
+
+                // uMessages.sort((a, b) => a.time - b.time);
+
+                // console.log(uMessages);
+                for (let index = 0; index < userMessages?.length; index++) {
+                    // console.log(JSON.parse(publicKey));
                     // let temp
                     // if(this.messages[index].reciverName == this.reciverName){
                     //     console.log(this.decodeMessage(this.reciverPublicKey, this.messages[index].message));
@@ -98,15 +139,27 @@ export default {
                     // console.log(new Date().getTimezoneOffset() * 60 * 1000);
                     // console.log("outcome",this.reciverName == this.messages[index].receiver);
                     // console.log("income",this.messages[index].receiver == this.username);
-                    if(this.messages[index].receiver == this.reciverName){
-                        decodedArray.push({"text": this.decodeMessage(this.reciverPublicKey, this.messages[index].message), "time": new Date(parseInt(this.messages[index].time) + new Date().getTimezoneOffset() * 60 * 1000).toLocaleString("en-US", { month: "short", day: 'numeric', hour: "numeric", minute: "numeric", hour12: true,}), "isWatched": false, "isSended": true, "inMessage": this.messages[index].receiver == this.username, "sender": this.messages[index].sender, "receiver": this.messages[index].receiver})
-                    }else{
-                        decodedArray.push({"text": this.decodeMessage(JSON.parse(publicKey), this.messages[index].message), "time": new Date(parseInt(this.messages[index].time) + new Date().getTimezoneOffset() * 60 * 1000).toLocaleString("en-US", { month: "short", day: 'numeric', hour: "numeric", minute: "numeric", hour12: true,}), "isWatched": false, "isSended": true, "inMessage": this.messages[index].receiver == this.reciverName, "sender": this.messages[index].sender, "receiver": this.messages[index].receiver})
+                    // console.log(this.messages[0]);
+                    let temp = userMessages[index]
+                    // console.log(this.reciverPublicKey);
+                    
+                    let isOutCome = temp.receiver === this.username
+                    console.log(this.decodeMessage(this.reciverPublicKey, temp.message));
+                    if(temp?.receiver == this.store.getReciver()){
+                        decodedArray.push({"text": this.decodeMessage(this.reciverPublicKey, temp.message), "time": new Date(parseInt(temp.time) + new Date().getTimezoneOffset() * 60 * 1000).toLocaleString("en-US", { month: "short", day: 'numeric', hour: "numeric", minute: "numeric", hour12: true,}), "isWatched": false, "isSended": true, "inMessage": isOutCome, "sender": temp.sender, "receiver": temp.receiver})
+                    }else if(temp?.receiver == "new_user2"){
+                        decodedArray.push({"test": this.decodeMessage(JSON.parse(publicKey), temp.message), "time": new Date(parseInt(temp.time) + new Date().getTimezoneOffset() * 60 * 1000).toLocaleString("en-US", { month: "short", day: 'numeric', hour: "numeric", minute: "numeric", hour12: true,}), "isWatched": false, "isSended": true, "inMessage": isOutCome, "sender": temp.sender, "receiver": temp.receiver })
                     }
+                    // if(temp?.receiver == this.reciverName){
+                    //     decodedArray.push({"text": this.decodeMessage(this.reciverPublicKey, temp.message), "time": new Date(parseInt(temp.time) + new Date().getTimezoneOffset() * 60 * 1000).toLocaleString("en-US", { month: "short", day: 'numeric', hour: "numeric", minute: "numeric", hour12: true,}), "isWatched": false, "isSended": true, "inMessage": temp.receiver == this.username, "sender": temp.sender, "receiver": temp.receiver})
+                    // }else if(temp?.receiver = this.username){
+                    //     decodedArray.push({"text": this.decodeMessage(JSON.parse(publicKey), temp.message), "time": new Date(parseInt(temp.time) + new Date().getTimezoneOffset() * 60 * 1000).toLocaleString("en-US", { month: "short", day: 'numeric', hour: "numeric", minute: "numeric", hour12: true,}), "isWatched": false, "isSended": true, "inMessage": temp.receiver == this.reciverName, "sender": temp.sender, "receiver": temp.receiver})
+                    // }
+
                     // const element = array[index];
                 }
                 this.messages = decodedArray;
-                console.log(decodedArray);
+                // console.log(decodedArray);
                 
                 // Handle the response data
                 // console.log(response.data?.value?.[0]);
@@ -120,7 +173,7 @@ export default {
         fetchData();
 
             // Set up the interval to execute fetchData every 1 second (adjust as needed)
-        setInterval(fetchData, 2000);
+        setInterval(fetchData, 4000);
         // this.$once("hook:beforeDestroy", () => {
         // // Clean up the interval when the component is unmounted
         //     clearInterval(intervalId);
@@ -146,7 +199,7 @@ export default {
                         'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token'))
                     },
                     body: JSON.stringify({
-                        receiver: this.reciverName,
+                        receiver: this.store.getReciver(),
                         message: cryptedMsg
                     })
                 }).then(response => response.json()).then(data => {
@@ -163,9 +216,9 @@ export default {
                 const originalText = bytes.toString(enc.Utf8);
                 return originalText;
             } catch (error) {
-                console.error('Decryption error:', error.message);
+                // console.error('Decryption error:', error.message);
                 return null
-                throw error;
+                // throw error;
             }
         },
         encodeMessage(secretKey, message) {
@@ -173,9 +226,9 @@ export default {
                 const cipherText = AES.encrypt(message, secretKey).toString();
                 return cipherText;
             } catch (error) {
-                console.error('Encryption error:', error.message);
+                // console.error('Encryption error:', error.message);
                 return null
-                throw error;
+                // throw error;
             }
         }
            
