@@ -58,13 +58,13 @@ export default {
   },
   mounted(){
     const fetchData = async () => {
+      
       if(this.store.getReciver() != null){
         fetch('https://octopus-app-l4b7l.ondigitalocean.app/profile/' + this.store.getReciver(),{
             method: 'GET',
         }).then(response => response.json()).then(data => {
-            if(data.ok){
-              this.lastSeeTime = data.lastTimeOnline;
-            }
+            console.log("Last seen",data.lastTimeOnline);
+            this.lastSeeTime = data?.lastTimeOnline;
             
       })
       }
@@ -85,8 +85,10 @@ export default {
           // if (!this.userList.find(data)) {
           //   this.userList.push(data);
           // }
+          this.lastSeeTime = data.lastTimeOnline;
           this.userList.push(data?.username);
           this.store.getUserList().push(data);
+          this.store.setReciver(this.searchUserInput)
           console.log(data);
         }else{
           this.toastStore.setToastContent("User: " + this.searchUserInput + " don't exist")
