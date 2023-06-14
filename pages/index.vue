@@ -76,15 +76,16 @@ export default {
     },
     mounted(){
         // this.username = localStorage.getItem('username');
-        fetch('https://octopus-app-l4b7l.ondigitalocean.app/publicKey/' + this.store.getReciver(),{
-            method: 'GET',
-        }).then(response => response.json()).then(data => {
-            this.reciverPublicKey = data.publicKey
-            this.store.setUsername(this.username)
-            console.log("reciver pk",data);
-        })
+        
         // alert(this.reciverPublicKey);
         const fetchData = async () => {
+                fetch('https://octopus-app-l4b7l.ondigitalocean.app/publicKey/' + this.store.getReciver(),{
+                method: 'GET',
+            }).then(response => response.json()).then(data => {
+                this.reciverPublicKey = data.publicKey
+                this.store.setUsername(this.username)
+                console.log("reciver pk",data);
+            })
             try {
                 
                 const publicKey = localStorage.getItem('publicKey');
@@ -144,7 +145,7 @@ export default {
                     // console.log(this.reciverPublicKey);
                     
                     let isOutCome = temp.receiver === this.username
-                    console.log(this.decodeMessage(this.reciverPublicKey, temp.message));
+                    console.log(temp.message,this.reciverPublicKey, this.decodeMessage(this.reciverPublicKey, temp.message));
                     if(temp?.receiver == this.store.getReciver()){
                         decodedArray.push({"text": this.decodeMessage(this.reciverPublicKey, temp.message), "time": new Date(parseInt(temp.time) + new Date().getTimezoneOffset() * 60 * 1000).toLocaleString("en-US", { month: "short", day: 'numeric', hour: "numeric", minute: "numeric", hour12: true,}), "isWatched": false, "isSended": true, "inMessage": isOutCome, "sender": temp.sender, "receiver": temp.receiver})
                     }else if(temp?.receiver == "new_user2"){
