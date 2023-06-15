@@ -78,7 +78,7 @@ export default {
         // this.username = localStorage.getItem('username');
         this.username = this.store.getUsername()
         this.reciverName = this.store.getReciver()
-        alert(this.username)
+        // alert(this.username)
         // alert(this.reciverPublicKey);
         const fetchData = async () => {
                 fetch('https://octopus-app-l4b7l.ondigitalocean.app/publicKey/' + this.store.getReciver(),{
