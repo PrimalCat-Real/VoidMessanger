@@ -191,7 +191,7 @@ export default {
         fetchData();
 
             // Set up the interval to execute fetchData every 1 second (adjust as needed)
-        setInterval(fetchData, 5000);
+        setInterval(fetchData, 1300);
         // this.$once("hook:beforeDestroy", () => {
         // // Clean up the interval when the component is unmounted
         //     clearInterval(intervalId);
