@@ -1,5 +1,5 @@
 <template>
-  <div class="header w-full max-h-12 h-12 flex-auto bg-dark-400 flex flex-col items-center ">
+  <div class="header w-full max-h-12 h-12 flex-auto bg-dark-400 flex flex-col items-center">
     <div class="wrapper flex w-1/2 lg:w-3/4 sm:w-full sm:px-5 h-full items-center justify-between">
         <div class="text flex items-center gap-4">
             <img class="h-9 w-9" src="@/assets/avatar.png" alt="">
@@ -17,7 +17,7 @@
     </div>
       
   </div>
-  <div v-if="isOpenList" class="list items-center p-8 absolute top-[10%] left-1/2 -translate-x-1/2 bg-dark-400 rounded-xl shadow-sm min-h-[300px] h-1/2 min-w-[200px] w-1/5 z-50 flex flex-col">
+  <div v-if="isOpenList" class="list sm:p-3 lg:p-4 w-fit items-center p-6 absolute top-[10%] left-1/2 -translate-x-1/2 bg-dark-400 rounded-xl shadow-sm min-h-[300px] h-1/2 min-w-[200px] z-50 flex flex-col">
     <svg @click.prevent="isOpenList = !isOpenList"  class="absolute top-4 right-4 stroke-light-200 hover:stroke-light-default transition-colors duration-200 cursor-pointer" width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
     <path d="M17 1L1 17M17 17L1 1" class="stroke-inherit" stroke-width="2" stroke-linecap="round"/>
     </svg>

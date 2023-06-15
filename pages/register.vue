@@ -26,6 +26,7 @@ definePageMeta({
 
 <script>
 import { root } from 'postcss';
+import { useProfileStore } from '~/stores/ProfileStore';
 export default {
   data() {
     return {
@@ -33,6 +34,7 @@ export default {
       password: null,
       privateKey: null,
       errors: null,
+      profileSotre: useProfileStore(),
     }
   },
   setup(){
@@ -60,7 +62,7 @@ export default {
             // Serialize and store the private key in local storage
             localStorage.setItem('privateKey', JSON.stringify(this.privateKey));
             const publicUsername = data.username
-
+            this.profileSotre.setUsername(data.username);
             const serializedKeyR = localStorage.getItem('privateKey');
             localStorage.setItem('username', JSON.stringify(publicUsername));
             if (serializedKeyR) {

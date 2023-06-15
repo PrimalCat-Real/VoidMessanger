@@ -35,7 +35,7 @@
         </button>
     </div>
     <div class="page w-1/2 lg:w-3/4 sm:w-full sm:px-5 overflow-auto">
-    <Message v-for="message in messages" :time="message.time" :key="message" :inMessage="message.inMessage" :isSended="true">
+    <Message v-for="message in vMessages" :time="message.time" :key="message" :inMessage="message.inMessage" :isSended="true">
         <h1>{{message.text}}</h1>     
         <!-- <h2>{{message.time}}</h2> -->
     </Message>
@@ -64,13 +64,14 @@ export default {
         return{
             messages: [],
             inputValue: null,
-            reciverName: "ki_2",
+            reciverName: null,
             reciverPublicKey: null,
             lastSeeTime: 1686595509368,
             isOnline: "Online",
             store: useProfileStore(),
             toastStore: useToastStore(),
-            username: 'test_user'
+            username: null,
+            vMessages: null,
             // rsaKey: new NodeRSA()
         }
     },
@@ -81,31 +82,37 @@ export default {
         // alert(this.username)
         // alert(this.reciverPublicKey);
         const fetchData = async () => {
+            if(this.store.getReciver() != null){
+                this.reciverName = this.store.getReciver()
                 fetch('https://octopus-app-l4b7l.ondigitalocean.app/publicKey/' + this.store.getReciver(),{
-                method: 'GET',
-            }).then(response => response.json()).then(data => {
-                this.reciverPublicKey = data.publicKey
-                this.store.setUsername(this.username)
-                console.log("reciver pk",data);
-            })
+                    method: 'GET',
+                }).then(response => response.json()).then(data => {
+                    this.reciverPublicKey = data.publicKey
+                    this.store.setUsername(this.username)
+                    console.log("reciver pk",data);
+                })
+            }
+                
             try {
                 
                 const publicKey = localStorage.getItem('publicKey');
-                const response = await useFetch('https://octopus-app-l4b7l.ondigitalocean.app/messages', {
-                method: 'GET',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token'))
-                },
-                });
-                this.messages = response.data?.value
-                console.log("pk",publicKey);
-                console.log("msg",this.messages);
-                const usernames = this.messages
-                    .filter(item => item.username === "new_user2" || item.messages.some(msg => msg.sender === "new_user2"))
-                    .map(item => {
-                        this.store.pushUser(item.username)
-                        })
+                console.log(publicKey);
+                
+                    const response = await useFetch('https://octopus-app-l4b7l.ondigitalocean.app/messages', {
+                    method: 'GET',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token'))
+                    },
+                    });
+                    this.messages = response.data?.value
+                    console.log("pk",publicKey);
+                    console.log("msg",this.messages);
+                    const usernames = this.messages
+                        .filter(item => item.username === "new_user2" || item.messages.some(msg => msg.sender === "new_user2"))
+                        .map(item => {
+                            this.store.pushUser(item.username)
+                            })
 
                
                 console.log(usernames);
@@ -161,7 +168,15 @@ export default {
 
                     // const element = array[index];
                 }
-                this.messages = decodedArray;
+                
+                if(this.reciverPublicKey != null && this.username != null){
+                    this.vMessages = decodedArray;
+                }else{
+                    console.log(this.reciverName != null);
+                }
+                
+
+                
                 // console.log(decodedArray);
                 
                 // Handle the response data
@@ -176,7 +191,7 @@ export default {
         fetchData();
 
             // Set up the interval to execute fetchData every 1 second (adjust as needed)
-        setInterval(fetchData, 4000);
+        setInterval(fetchData, 5000);
         // this.$once("hook:beforeDestroy", () => {
         // // Clean up the interval when the component is unmounted
         //     clearInterval(intervalId);
@@ -184,7 +199,8 @@ export default {
     },
     methods: {
         sendMsg(){
-            const serializedKey = localStorage.getItem('privateKey');
+            if(this.username != null && this.reciverName != null){
+                const serializedKey = localStorage.getItem('privateKey');
             const serializedToken = localStorage.getItem('token');
             const publicKey = localStorage.getItem('publicKey');
             const username = localStorage.getItem('username');
@@ -210,6 +226,8 @@ export default {
                     this.inputValue = ""
                 });
             }
+            }
+            
            
             
         },
