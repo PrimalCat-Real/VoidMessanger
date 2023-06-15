@@ -25,6 +25,7 @@ definePageMeta({
 </template>
 
 <script>
+import { useProfileStore } from '~/stores/ProfileStore';
 import { useTokenStore } from '~/stores/TokenStore';
 export default {
   data() {
@@ -35,6 +36,7 @@ export default {
       publicKey: null,
       errors: null,
       store: useTokenStore(),
+      profileSotre: useProfileStore(),
     }
   },
   methods: {
@@ -57,11 +59,14 @@ export default {
             this.token = data.token
             this.publicKey = data.publicKey
             const publicUsername = data.username
+
+
             
             localStorage.setItem('token', JSON.stringify(this.token));
             localStorage.setItem('publicKey', JSON.stringify(this.publicKey));
             localStorage.setItem('username', JSON.stringify(publicUsername));
 
+            this.profileSotre.setUsername(data.username);
             this.store.setAuthToken(this.token)
             const router = useRouter();
             router.push("/")

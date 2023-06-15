@@ -70,13 +70,15 @@ export default {
             isOnline: "Online",
             store: useProfileStore(),
             toastStore: useToastStore(),
-            username: 'new_user2'
+            username: 'test_user'
             // rsaKey: new NodeRSA()
         }
     },
     mounted(){
         // this.username = localStorage.getItem('username');
-        
+        this.username = this.store.getUsername()
+        this.reciverName = this.store.getReciver()
+        alert(this.username)
         // alert(this.reciverPublicKey);
         const fetchData = async () => {
                 fetch('https://octopus-app-l4b7l.ondigitalocean.app/publicKey/' + this.store.getReciver(),{
