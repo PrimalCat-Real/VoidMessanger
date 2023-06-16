@@ -4,7 +4,7 @@
         <div class="text flex items-center gap-4">
             <img class="h-9 w-9" src="@/assets/avatar.png" alt="">
             <div class="wrapper flex flex-col justify-start">
-              <h1 placeholder="search user" class="text-md text-light-default outline-none focus:outline-none ring-0 bg-transparent autofill:bg-transparent font-medium">{{store.getReciver()}}</h1>
+              <h1 placeholder="search user" class="text-md text-light-default outline-none focus:outline-none ring-0 bg-transparent autofill:bg-transparent font-medium">{{ifSaved()}}</h1>
               <h2 class="text-light-200 text-sm mb-1">{{onlineStatus}}</h2>
             </div>
             
@@ -67,6 +67,13 @@ export default {
             this.lastSeeTime = data?.lastTimeOnline;
             
       })
+      }else{
+         fetch('https://octopus-app-l4b7l.ondigitalocean.app/profile/' + this.store.getUsername(),{
+            method: 'GET',
+        }).then(response => response.json()).then(data => {
+            console.log("Last seen",data.lastTimeOnline);
+            this.lastSeeTime = data?.lastTimeOnline;
+            })
       }
       
     }
@@ -75,6 +82,14 @@ export default {
     setInterval(fetchData, 10000);
   },
   methods:{
+    ifSaved(){
+      if(this.store.getReciver() != this.store.getUsername()){
+        return this.store.getReciver()
+      }else{
+        return "Saved"
+      }
+      
+    },
      async searchUser() {
       try {
         const response = await fetch('https://octopus-app-l4b7l.ondigitalocean.app/profile/' + this.searchUserInput, {
@@ -89,7 +104,7 @@ export default {
           // }
           
           this.userList.push(data?.username);
-          this.store.getUserList().push(data);
+          this.store.pushUser(data?.username);
           this.store.setReciver(this.searchUserInput)
           console.log(data);
         }else{
