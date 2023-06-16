@@ -83,7 +83,7 @@ export default {
   },
   methods:{
     ifSaved(){
-      if(this.store.getReciver() != this.store.getUsername()){
+      if(this.store.getReciver() != this.store.getUsername() && this.store?.getReciver() != null){
         return this.store.getReciver()
       }else{
         return "Saved"
