@@ -81,9 +81,10 @@ export default {
       }
       if(this.errors == null){
         const router = useRouter();
-        router.push("/").then(() => {
-        location.reload();
-      });
+        router.push("/")
+        // .then(() => {
+        // location.reload();
+      // });
       }
     },
     validateForm() {
