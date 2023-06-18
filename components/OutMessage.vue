@@ -1,10 +1,10 @@
 <template>
-  <div class="message flex h-8 sm:h-fit items-end min-w-[23%] max-w-[44%] sm:max-w-[70%] w-fit my-2 ml-auto">
-    <div class="flex bg-main-default h-full px-4 w-full text-light-default rounded-s-lg rounded-t-lg items-center justify-between z-0 gap-4 py-1">
+  <div class="message flex min-h-8 h-fit sm:h-fit items-end min-w-[23%] max-w-[44%] sm:max-w-[70%] w-full my-2 ml-auto">
+    <div class="flex bg-main-default h-full px-4 w-full overflow-hidden text-light-default rounded-s-lg rounded-t-lg items-center justify-between z-0 gap-4 py-1">
         <slot>
         </slot>
-         <div class="wrapper h-full flex items-end gap-2">
-            <h2 class="text-[12px] ">{{time}}</h2>
+         <div class="wrapper h-full flex mt-auto gap-2">
+            <h2 class="text-[12px] whitespace-nowrap">{{time}}</h2>
         </div>
     </div>
     <div class="wrapper flex items-end h-full">

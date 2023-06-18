@@ -1,15 +1,15 @@
 <template>
-<div v-if="inMessage" class="message flex h-8 sm:h-fit items-end min-w-[23%] max-w-[44%] sm:max-w-[70%] w-fit my-2">
+<div v-if="inMessage" class="message flex min-h-8 h-fit sm:h-fit items-end min-w-[23%] max-w-[44%] sm:max-w-[70%] w-full my-2">
     <div class="wrapper flex items-end h-full">
         <svg class="z-10" width="8" height="21" viewBox="0 0 9 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path fill-rule="evenodd" clip-rule="evenodd" d="M1.28593 24H9V0C8.75186 4.00941 7.87375 8.14165 6.36436 12.3981C5.20211 15.6805 3.21959 18.7299 0.418102 21.5464C0.226811 21.7384 0.0928549 21.9895 0.0338063 22.2666C-0.0252423 22.5438 -0.00662584 22.834 0.0872135 23.0993C0.181053 23.3647 0.345733 23.5926 0.55965 23.7534C0.773568 23.9141 1.02673 24.0001 1.28593 24Z" fill="#212121"/>
         </svg>
     </div>
-    <div class="flex bg-dark-400 h-full px-4 w-full text-light-200 rounded-e-lg rounded-t-lg items-center justify-between gap-4 py-1">
+    <div class="flex bg-dark-400 h-full overflow-hidden px-4 w-full text-light-200 rounded-e-lg rounded-t-lg items-center justify-between gap-4 py-1 ">
         <slot>
         </slot>
-         <div class="wrapper h-full flex items-end gap-2">
-            <h2 class="text-[12px] ">{{time}}</h2>
+         <div class="wrapper h-full flex mt-auto gap-2">
+            <h2 class="text-[12px] whitespace-nowrap">{{time}}</h2>
             <svg v-if="isSended" width="16" class="pb-[2px]" height="14" viewBox="0 0 17 11" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M4.11816 8.45114L10.6494 0.973604C10.7731 0.837536 10.9246 0.763318 11.104 0.750948C11.2834 0.738578 11.4411 0.788057 11.5771 0.899385C11.7008 1.01071 11.772 1.14678 11.7905 1.30759C11.8091 1.4684 11.7751 1.61065 11.6885 1.73435L11.6328 1.82712L4.6377 9.82419C4.52637 9.94789 4.38721 10.019 4.22021 10.0376C4.05322 10.0561 3.90169 10.0221 3.76562 9.93552L3.69141 9.8613L0.685547 6.85544C0.561849 6.73174 0.5 6.58021 0.5 6.40085C0.5 6.22149 0.561849 6.06377 0.685547 5.92771C0.796875 5.81638 0.932943 5.75453 1.09375 5.74216C1.25456 5.72979 1.39681 5.77308 1.52051 5.87204L1.61328 5.92771L4.11816 8.45114ZM9.10938 8.45114L15.6592 0.973604C15.7705 0.837536 15.9159 0.763318 16.0952 0.750948C16.2746 0.738578 16.4323 0.788057 16.5684 0.899385C16.6921 1.01071 16.7663 1.14678 16.791 1.30759C16.8158 1.4684 16.7848 1.61065 16.6982 1.73435L16.6426 1.82712L9.62891 9.82419C9.51758 9.94789 9.38151 10.019 9.2207 10.0376C9.0599 10.0561 8.91146 10.0221 8.77539 9.93552L8.68262 9.8613L7.68066 8.85935C7.55697 8.73565 7.49512 8.58412 7.49512 8.40476C7.49512 8.22539 7.55697 8.06768 7.68066 7.93161C7.80436 7.82028 7.94352 7.75843 8.09814 7.74606C8.25277 7.7337 8.39193 7.77699 8.51562 7.87595L8.6084 7.93161L9.10938 8.45114Z" fill="white"/>
             </svg>

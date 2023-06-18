@@ -7,7 +7,7 @@
         </svg>
     </button>
     </div>
-  <div class="w-full flex-1 flex-col h-full overflow-hidden items-center flex gap-5">
+  <div class="w-full flex-1 flex-col h-full overflow-hidden items-center flex gap-5 max-h-[85vh]">
     <!-- input bar -->
     <div class="input-wrapper w-1/2 lg:w-3/4 sm:w-full sm:px-5 absolute bottom-6 items-end left-1/2 flex -translate-x-1/2 ">
         <div class="input flex w-full  h-12 bg-dark-400 rounded-s-xl rounded-t-xl px-4 z-0">
@@ -34,14 +34,14 @@
             </svg>
         </button>
     </div>
-    <div class="page w-1/2 lg:w-3/4 sm:w-full sm:px-5 overflow-auto">
+    <div class="page w-1/2 lg:w-3/4 sm:w-full sm:px-5 overflow-y-auto ">
     <Message v-for="message in vMessages" :time="message.time" :key="message" :inMessage="message.inMessage" :isSended="true">
-        <h1>{{message.text}}</h1>     
+        <p class="whitespace-pre-wrap text-sm truncate">{{message.text}}</p>     
         <!-- <h2>{{message.time}}</h2> -->
     </Message>
     
     </div>
-    <div class="spacer h-40"></div>
+   
   </div>
 </template>
 
@@ -204,7 +204,7 @@ export default {
         fetchData();
 
             // Set up the interval to execute fetchData every 1 second (adjust as needed)
-        setInterval(fetchData, 1300);
+        setInterval(fetchData, 1000);
         // this.$once("hook:beforeDestroy", () => {
         // // Clean up the interval when the component is unmounted
         //     clearInterval(intervalId);
