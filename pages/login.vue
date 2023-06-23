@@ -68,13 +68,17 @@ export default {
 
             this.profileSotre.setUsername(data.username);
             this.store.setAuthToken(this.token)
+            
             const router = useRouter();
             router.push("/")
+            console.log("pushed");
+            
           })
           .catch(error => {
             // Handle any errors
             console.error(error);
             this.errors = error
+            
           });
       }
       // if(this.errors == null){

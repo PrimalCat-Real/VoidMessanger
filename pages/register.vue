@@ -56,7 +56,7 @@ export default {
           .then(response => response.json())
           .then(data => {
             // Handle the response data
-            console.log(data.privateKey);
+            // console.log(data.privateKey);
             this.privateKey = data.privateKey
 
             // Serialize and store the private key in local storage
@@ -82,9 +82,7 @@ export default {
       if(this.errors == null){
         const router = useRouter();
         router.push("/")
-        // .then(() => {
-        // location.reload();
-      // });
+        
       }
     },
     validateForm() {
