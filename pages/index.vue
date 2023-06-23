@@ -152,7 +152,7 @@ export default {
                         // console.log(, temp.receiver, this.store.getReciver());
                         if(this.store.getReciver() == temp?.receiver || temp.sender == this.store.getReciver()){
                             // console.log(temp?.receiver);
-                            decodedArray.push({"text": temp.message, "time": new Date(parseInt(temp.time) + new Date().getTimezoneOffset() * 60 * 1000).toLocaleString("en-US", { month: "short", day: 'numeric', hour: "numeric", minute: "numeric", hour12: true,}), "isWatched": false, "isSended": true, "inMessage": !isOutCome, "sender": temp.sender, "receiver": temp.receiver})
+                            decodedArray.push({"text": this.decodeMessage(this.reciverPublicKey, temp.message), "time": new Date(parseInt(temp.time) + new Date().getTimezoneOffset() * 60 * 1000).toLocaleString("en-US", { month: "short", day: 'numeric', hour: "numeric", minute: "numeric", hour12: true,}), "isWatched": false, "isSended": true, "inMessage": !isOutCome, "sender": temp.sender, "receiver": temp.receiver})
                         }
                         // }
                         // else if(temp?.receiver == this.username){
@@ -197,9 +197,9 @@ export default {
 
                 // Store the message in localStorage
                 this.storeMessage(this.userMessages);
-
+                
                 // Send the message to the server
-                this.sendMessage(this.store.getReciver(), this.userMessages);
+                this.sendMessage(this.store.getReciver(), this.encodeMessage(this.reciverPublicKey,this.userMessages));
 
                 this.inputValue = "";
                 }
@@ -251,10 +251,13 @@ export default {
             try {
                 const bytes = AES.decrypt(cipherText, secretKey);
                 const originalText = bytes.toString(enc.Utf8);
-                return originalText;
+                if(originalText){
+                    return originalText
+                }
+                return cipherText;
             } catch (error) {
                 // console.error('Decryption error:', error.message);
-                return null
+                return cipherText
                 // throw error;
             }
         },
