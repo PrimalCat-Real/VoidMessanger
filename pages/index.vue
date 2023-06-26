@@ -168,7 +168,7 @@ export default {
         fetchData();
 
             // Set up the interval to execute fetchData every 1 second (adjust as needed)
-        setInterval(fetchData, 4000);
+        setInterval(fetchData, 600);
     },
     methods: {
        sendMsg() {
