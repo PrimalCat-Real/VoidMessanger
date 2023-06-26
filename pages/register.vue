@@ -26,7 +26,9 @@ definePageMeta({
 
 <script>
 import { root } from 'postcss';
+import JSEncrypt from 'JSEncrypt'
 import { useProfileStore } from '~/stores/ProfileStore';
+import { useKeyStore } from '~/stores/KeyStore';
 export default {
   data() {
     return {
@@ -35,6 +37,7 @@ export default {
       privateKey: null,
       errors: null,
       profileSotre: useProfileStore(),
+      keyStore: useKeyStore(),
     }
   },
   setup(){
@@ -57,20 +60,14 @@ export default {
           .then(data => {
             // Handle the response data
             // console.log(data.privateKey);
-            this.privateKey = data.privateKey
-
-            // Serialize and store the private key in local storage
-            localStorage.setItem('privateKey', JSON.stringify(this.privateKey));
             const publicUsername = data.username
             this.profileSotre.setUsername(data.username);
-            const serializedKeyR = localStorage.getItem('privateKey');
+
+           
+            this.keyStore.setPrivateKey(data.privateKey)
+            localStorage.setItem('privateKey', JSON.stringify(data.privateKey));
             localStorage.setItem('username', JSON.stringify(publicUsername));
-            if (serializedKeyR) {
-              // Deserialize the private key
-              console.log(JSON.parse(serializedKeyR));
-            }
             this.errors = null
-            // router.push("test/");
           })
           .catch(error => {
             // Handle any errors
@@ -88,10 +85,10 @@ export default {
     validateForm() {
       if (!this.username || !this.password) {
         // Display an error message or perform any other validation logic
-        console.log("Please fill in all fields");
+        alert("Please fill in all fields");
         return false;
       }
-      console.log(this.password, this.username);
+      // console.log(this.password, this.username);
       return true;
     }
   }

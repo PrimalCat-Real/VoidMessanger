@@ -63,7 +63,7 @@ export default {
         fetch('https://octopus-app-l4b7l.ondigitalocean.app/profile/' + this.store.getReciver(),{
             method: 'GET',
         }).then(response => response.json()).then(data => {
-            console.log("Last seen",data.lastTimeOnline);
+            // console.log("Last seen",data.lastTimeOnline);
             this.lastSeeTime = data?.lastTimeOnline;
             
       })
@@ -71,7 +71,7 @@ export default {
          fetch('https://octopus-app-l4b7l.ondigitalocean.app/profile/' + this.store.getUsername(),{
             method: 'GET',
         }).then(response => response.json()).then(data => {
-            console.log("Last seen",data.lastTimeOnline);
+            // console.log("Last seen",data.lastTimeOnline);
             this.lastSeeTime = data?.lastTimeOnline;
             })
       }
@@ -99,14 +99,10 @@ export default {
        if (response.ok) {
            const data = await response.json();
           this.lastSeeTime = data.lastTimeOnline;
-          // if (!this.userList.find(data)) {
-          //   this.userList.push(data);
-          // }
           
           this.userList.push(data?.username);
           this.store.pushUser(data?.username);
           this.store.setReciver(this.searchUserInput)
-          console.log(data);
         }else{
           this.toastStore.setToastContent("User: " + this.searchUserInput + " don't exist")
           this.toastStore.showToast()
@@ -127,19 +123,19 @@ export default {
   },
   computed: {
     onlineStatus() {
-      console.log("seen time", this.lastSeeTime);
+      // console.log("seen time", this.lastSeeTime);
       const date1 = new Date(this.lastSeeTime);
       const date2 = new Date();
       const timeDifference = date2.getTime() - date1.getTime();
       if(this.username.length > 0 && this.store.getReciver() != null){
         if (timeDifference >= 60000) {
-          console.log("Last seen", date1.getTime());
+          // console.log("Last seen", date1.getTime());
           return "Last seen " + date1.toLocaleString("en-US", {hour: "numeric", minute: "numeric", hour12: true,}) + " " + date1.toLocaleString("en-US", { month: "short", day: 'numeric', year: "numeric"})
         } else if (date1 < date2) {
-            console.log("Online");
+            // console.log("Online");
             return "Online"
         } else {
-            console.log("date1 is later than date2");
+            // console.log("date1 is later than date2");
             return "Time don't exist"
         }
       }

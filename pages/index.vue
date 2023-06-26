@@ -56,9 +56,11 @@ definePageMeta({
 </script>
 
 <script>
+import JSEncrypt from 'JSEncrypt'
 import { AES, enc } from 'crypto-js';
 import { useProfileStore } from '~/stores/ProfileStore';
 import { useToastStore } from '~/stores/ToastStore';
+import { useKeyStore } from '~/stores/KeyStore';
 export default {
     data(){
         return{
@@ -70,14 +72,17 @@ export default {
             isOnline: "Online",
             store: useProfileStore(),
             toastStore: useToastStore(),
+            keyStore: useKeyStore(),
             username: null,
             vMessages: null,
-            userMessages: []
+            userMessages: [],
+            tempMsg: "",
+            encryptor: new JSEncrypt(),
+            encodedMsg: ""
             // rsaKey: new NodeRSA()
         }
     },
     mounted(){
-
         // trash checking for nulls
         this.username = localStorage.getItem('username').replace('"','').replace('"','');
         
@@ -85,6 +90,7 @@ export default {
             this.reciverName = this.username
             this.store.setUsername(this.username)
             this.store.setReciver(this.reciverName)
+           
         }else{
             this.username = this.store.getUsername()
             this.reciverName = this.store.getReciver()
@@ -98,68 +104,51 @@ export default {
                     method: 'GET',
                 }).then(response => response.json()).then(data => {
                     this.reciverPublicKey = data.publicKey
+                    this.keyStore.setPublicKey(data.publicKey)            
+                    
                     this.store.setUsername(this.username)
-                    // console.log("reciver pk",data);
                 })
             }
         
             try {
-                const publicKey = localStorage.getItem('publicKey');       
-                    const response = await useFetch('https://octopus-app-l4b7l.ondigitalocean.app/messages', {
-                    method: 'GET',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token'))
-                    },
-                    });
-                    this.messages = response.data?.value
-                    const usernames = this.messages
-                        .filter(item => item.username === "new_user2" || item.messages.some(msg => msg.sender === "new_user2"))
-                        .map(item => {
-                            this.store.pushUser(item.username)
-                            })
+                const response = await useFetch('https://octopus-app-l4b7l.ondigitalocean.app/messages', {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token'))
+                },
+                });
+            
+                this.messages = response.data?.value
+                const usernames = this.messages
+                    .filter(item => item.username === "new_user2" || item.messages.some(msg => msg.sender === "new_user2"))
+                    .map(item => {
+                        this.store.pushUser(item.username)
+                        })
 
                 let decodedArray = []
                 const userMessages = this.messages
                     ?.find(item => item.username === this.store.getReciver())
                     ?.messages.filter(msg => msg.sender !== this.username);
                 
-
+                // console.log(this.messages);
                 const value = JSON.parse(localStorage.getItem("messages"));
-                const combinedMessages = [...userMessages, ...value];
+                const combinedMessages = userMessages != null ? [...userMessages, ...value] : value;
+                
                 const combinedSortedMessages = combinedMessages.sort((a, b) => a.time - b.time);
-                console.log(combinedSortedMessages);
                 const removedMessages = combinedSortedMessages.filter(message => typeof message.time !== 'undefined' && Number.isInteger(message.time));
-                const filteredMessages = removedMessages.sort((a, b) => a.time - b.time);
-                // for (let i = 0; i < filteredMessages.length; i++) {
-                //     // const key = localStorage.key("messages");
-                    
-                //     console.log(filteredMessages[i]);
-                // }
+                let filteredMessages = removedMessages.sort((a, b) => a.time - b.time);
+                this.decodeMessage(filteredMessages)
+                filteredMessages = this.encodedMsg
                 for (let index = 0; index < filteredMessages?.length; index++) { 
                     let temp = filteredMessages[index]
-                    // console.log(this.reciverPublicKey);
                     if(temp?.sender){
-                        // let isOutCome = temp.sender === this.username && temp.receiver === this.reciverName
                          let isOutCome = temp.receiver === this.store.getReciver()
-                        //  console.log(isOutCome);
-                        // console.log(temp.message,this.reciverPublicKey, this.decodeMessage(this.reciverPublicKey, temp.message));
-                        // console.log(temp?.sender, this.username, temp?.sender != this.username);
-                        // console.log(this.decodeMessage(this.reciverPublicKey, temp.message));
-                        // temp?.sender != this.username && 
-                        // this.decodeMessage(this.reciverPublicKey, temp.message)
-                        // console.log(temp.sender === this.username);
-                        // console.log(, temp.receiver, this.store.getReciver());
+
                         if(this.store.getReciver() == temp?.receiver || temp.sender == this.store.getReciver()){
-                            // console.log(temp?.receiver);
-                            decodedArray.push({"text": this.decodeMessage(this.reciverPublicKey, temp.message), "time": new Date(parseInt(temp.time) + new Date().getTimezoneOffset() * 60 * 1000).toLocaleString("en-US", { month: "short", day: 'numeric', hour: "numeric", minute: "numeric", hour12: true,}), "isWatched": false, "isSended": true, "inMessage": !isOutCome, "sender": temp.sender, "receiver": temp.receiver})
+                            // console.log(temp?.message);
+                            decodedArray.push({"text": temp.message, "time": new Date(parseInt(temp.time) + new Date().getTimezoneOffset() * 60 * 1000).toLocaleString("en-US", { month: "short", day: 'numeric', hour: "numeric", minute: "numeric", hour12: true,}), "isWatched": false, "isSended": true, "inMessage": !isOutCome, "sender": temp.sender, "receiver": temp.receiver})
                         }
-                        // }
-                        // else if(temp?.receiver == this.username){
-                        //     console.log(temp?.receiver);
-                        //     // console.log("test decoded messages", this.decodeMessage(JSON.parse(localStorage.getItem('privateKey'))), temp.receiver);
-                        //     decodedArray.push({"text": temp.message, "time": new Date(parseInt(temp.time) + new Date().getTimezoneOffset() * 60 * 1000).toLocaleString("en-US", { month: "short", day: 'numeric', hour: "numeric", minute: "numeric", hour12: true,}), "isWatched": false, "isSended": true, "inMessage": !isOutCome, "sender": temp.sender, "receiver": temp.receiver })
-                        // }
                     }
                     
                 }
@@ -172,7 +161,6 @@ export default {
                 }
             }catch (error) {
                 console.error(error);
-                // alert("Error");
             }
         };
 
@@ -185,95 +173,86 @@ export default {
     methods: {
        sendMsg() {
             if (this.username !== null && this.reciverName !== null) {
-                // Get required data from localStorage
+                // just some variables for future features
                 const serializedKey = localStorage.getItem('privateKey');
                 const serializedToken = localStorage.getItem('token');
-                const publicKey = localStorage.getItem('publicKey');
+                const publicKey = localStorage.getItem('publicKey').replace('"','').replace('"','');
                 const username = localStorage.getItem('username');
-                const algorithm = 'aes-256-cbc';
-
                 if (this.inputValue) {
-                this.userMessages = this.inputValue;
+                    this.tempMsg = this.inputValue;
 
                 // Store the message in localStorage
-                this.storeMessage(this.userMessages);
-                
+                    this.storeMessage(this.tempMsg);
                 // Send the message to the server
-                this.sendMessage(this.store.getReciver(), this.encodeMessage(this.reciverPublicKey,this.userMessages));
-
-                this.inputValue = "";
+                    this.sendMessage(this.store.getReciver(), this.tempMsg);
+                    this.inputValue = "";
                 }
-
-                // Log all stored messages
-                this.logStoredMessages();
             }
             },
 
 
         storeMessage(cryptedMsg) {
         // Store the message with its count in localStorage
-        const messages = JSON.parse(localStorage.getItem('messages')) || [];
-        messages.push({
-            receiver: this.store.getReciver(),
-            sender: this.store.getUsername(),
-            time: new Date().getTime(),
-            message: cryptedMsg
-        });
-        localStorage.setItem('messages', JSON.stringify(messages));
+            const messages = JSON.parse(localStorage.getItem('messages')) || [];
+            messages.push({
+                receiver: this.store.getReciver(),
+                sender: this.store.getUsername(),
+                time: new Date().getTime(),
+                message: cryptedMsg
+            });
+            localStorage.setItem('messages', JSON.stringify(messages));
         },
 
         sendMessage(receiver, message) {
-        // Send the message to the server
-        fetch('https://octopus-app-l4b7l.ondigitalocean.app/message', {
-            method: 'POST',
-            headers: {
-            'Content-Type': 'application/json',
-            'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token'))
-            },
-            body: JSON.stringify({
-            receiver: receiver,
-            message: message
-            })
-        }).then(response => response.json()).then(data => {
-            console.log("send msg", data);
-        });
+            fetch('https://octopus-app-l4b7l.ondigitalocean.app/encode',{
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    publicKey: this.keyStore.getPublicKey(this.publicKey ),
+                    message: message
+                })
+            }).then(response => response.json()).then(data => {
+                const tempEn = data.encryptedMessage
+                
+                 // Send the message to the server
+                fetch('https://octopus-app-l4b7l.ondigitalocean.app/message', {
+                    method: 'POST',
+                    headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + JSON.parse(localStorage.getItem('token'))
+                    },
+                    body: JSON.stringify({
+                    receiver: receiver,
+                    message: tempEn
+                    })
+                })
+                
+            });
+        
         },
-
-        logStoredMessages() {
-        // Log all stored messages
-        for (let i = 0; i < localStorage.length; i++) {
-            const key = localStorage.key(i);
-            const value = localStorage.getItem(key);
-            console.log(`Key: ${key}, Value: ${value}`);
-        }
-        },
-        decodeMessage(secretKey, cipherText) {
-            try {
-                const bytes = AES.decrypt(cipherText, secretKey);
-                const originalText = bytes.toString(enc.Utf8);
-                if(originalText){
-                    return originalText
-                }
-                return cipherText;
-            } catch (error) {
-                // console.error('Decryption error:', error.message);
-                return cipherText
-                // throw error;
+        decodeMessage(encryptedMessage) {
+            let returnValue = null;
+            try{
+                fetch('https://octopus-app-l4b7l.ondigitalocean.app/decode',{
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        privateKey: JSON.parse(localStorage.getItem('privateKey')),
+                        messages: encryptedMessage
+                    })
+                }).then(response => response.json()).then(data => {
+                    returnValue = data.decryptedMessages
+                    this.encodedMsg = data.decryptedMessages
+                });
+            }catch{
+                this.encodedMsg = encryptedMessage
             }
         },
-        encodeMessage(secretKey, message) {
-            try {
-                const cipherText = AES.encrypt(message, secretKey).toString();
-                return cipherText;
-            } catch (error) {
-                // console.error('Encryption error:', error.message);
-                return null
-                // throw error;
-            }
-        }
-            
-                // alert(JSON.parse(localStorage.getItem('token')))
-        }
+    }
 }
 </script>
 

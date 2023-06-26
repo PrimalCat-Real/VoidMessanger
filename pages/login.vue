@@ -24,10 +24,16 @@ definePageMeta({
   </div>
 </template>
 
+
 <script>
 import { useProfileStore } from '~/stores/ProfileStore';
 import { useTokenStore } from '~/stores/TokenStore';
+import JSEncrypt from 'JSEncrypt'
+import { useKeyStore } from '~/stores/KeyStore';
 export default {
+  mounted(){
+    
+  },
   data() {
     return {
       username: null,
@@ -37,11 +43,19 @@ export default {
       errors: null,
       store: useTokenStore(),
       profileSotre: useProfileStore(),
+      keyStore: useKeyStore(),
+      
     }
   },
+  
   methods: {
     loginSend() {
       if (this.validateForm()) {
+        
+      //       // Generate a new key pair
+        let encryptor = new JSEncrypt();
+        encryptor.getKey();
+
         fetch('https://octopus-app-l4b7l.ondigitalocean.app/login', {
           method: 'POST',
           headers: {
@@ -55,45 +69,39 @@ export default {
           .then(response => response.json())
           .then(data => {
             // Handle the response data
-            console.log(data);
+            // console.log(data);
             this.token = data.token
             this.publicKey = data.publicKey
             const publicUsername = data.username
-
+            this.store.setAuthToken(this.token)
 
             
             localStorage.setItem('token', JSON.stringify(this.token));
-            localStorage.setItem('publicKey', JSON.stringify(this.publicKey));
-            localStorage.setItem('username', JSON.stringify(publicUsername));
+            localStorage.setItem('publicKey', JSON.stringify(data.username));
 
+            localStorage.setItem('username', JSON.stringify(publicUsername));
+            this.keyStore.setPublicKey(this.publicKey )
             this.profileSotre.setUsername(data.username);
             this.store.setAuthToken(this.token)
             
-            const router = useRouter();
-            router.push("/")
-            console.log("pushed");
-            
+            useRouter().push("/")
+            // console.log("pushed");
           })
-          .catch(error => {
-            // Handle any errors
-            console.error(error);
-            this.errors = error
+      //     .catch(error => {
+      //       // Handle any errors
+      //       console.error(error);
+      //       this.errors = error
             
-          });
+      //     });
       }
-      // if(this.errors == null){
-        // this.store.setAuthToken(this.token)
-        // const router = useRouter();
-        // router.push("/")
-      // }
-    },
+      },
     validateForm() {
       if (!this.username || !this.password) {
         // Display an error message or perform any other validation logic
-        console.log("Please fill in all fields");
+       alert("Please fill in all fields");
         return false;
       }
-      console.log(this.password, this.username);
+      // console.log(this.password, this.username);
       return true;
     }
   }
