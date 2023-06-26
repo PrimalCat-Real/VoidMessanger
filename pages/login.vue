@@ -74,16 +74,15 @@ export default {
             this.publicKey = data.publicKey
             const publicUsername = data.username
             this.store.setAuthToken(this.token)
-
             
             localStorage.setItem('token', JSON.stringify(this.token));
-            localStorage.setItem('publicKey', JSON.stringify(data.username));
+            localStorage.setItem(JSON.stringify(publicUsername), JSON.stringify(data.username));
 
-            localStorage.setItem('username', JSON.stringify(publicUsername));
-            this.keyStore.setPublicKey(this.publicKey )
+            // localStorage.setItem('username', JSON.stringify(publicUsername));
+            this.keyStore.setPublicKey(this.publicKey)
             this.profileSotre.setUsername(data.username);
             this.store.setAuthToken(this.token)
-            
+            localStorage.setItem('messages', JSON.stringify([]));
             useRouter().push("/")
             // console.log("pushed");
           })

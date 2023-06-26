@@ -21,7 +21,7 @@
             <path fill-rule="evenodd" clip-rule="evenodd" d="M6.85695 17H0V0C0.220565 2.84 1.00111 5.767 2.34279 8.782C3.3759 11.107 5.13814 13.267 7.62835 15.262C7.79839 15.398 7.91746 15.5759 7.96995 15.7722C8.02244 15.9685 8.00589 16.1741 7.92248 16.362C7.83906 16.55 7.69268 16.7114 7.50253 16.8253C7.31238 16.9391 7.08735 17 6.85695 17Z" fill="#212121"/>
         </svg>
         </div> 
-        <button @click="sendMsg" class="min-w-[48px] min-h-[48px] h-full max-h-12 bg-dark-400 rounded-full flex items-center justify-center fill-main-default pl-2 hover:bg-main-default hover:fill-light-default transition-colors duration-300">
+        <button @click="sendMsg" class="min-w-[48px] min-h-[48px] h-full max-h-12 bg-dark-400 rounded-full flex items-center justify-center fill-main-default pl-2 hover:bg-main-default hover:fill-gray-300 transition-colors duration-300">
             <svg width="25" height="26" viewBox="0 0 25 26" class="fill-inherit" xmlns="http://www.w3.org/2000/svg">
             <g clip-path="url(#clip0_411_799)">
             <path d="M0.133577 4.81958L1.63358 11.6868C1.69608 11.9524 1.8328 12.1829 2.04373 12.3782C2.25467 12.5735 2.50076 12.679 2.78201 12.6946L13.6805 13.679C13.743 13.679 13.7937 13.7024 13.8328 13.7493C13.8719 13.7961 13.8836 13.8508 13.868 13.9133C13.868 13.9758 13.8484 14.0227 13.8094 14.054C13.7703 14.0852 13.7273 14.1086 13.6805 14.1243L2.78201 15.1086C2.50076 15.1243 2.25467 15.2258 2.04373 15.4133C1.8328 15.6008 1.69608 15.8352 1.63358 16.1165L0.133577 22.9602C0.0867018 23.2102 0.129671 23.4329 0.262483 23.6282C0.395296 23.8235 0.578889 23.9524 0.813264 24.0149C0.907014 24.0305 1.00076 24.0344 1.09451 24.0266C1.18826 24.0188 1.2742 23.9915 1.35233 23.9446L20.8992 14.6868C21.118 14.5774 21.2664 14.4094 21.3445 14.1829C21.4226 13.9563 21.4148 13.7336 21.3211 13.5149C21.2742 13.4368 21.2156 13.3625 21.1453 13.2922C21.075 13.2219 20.993 13.1633 20.8992 13.1165L1.35233 3.85864C1.13358 3.74927 0.914827 3.73755 0.696077 3.82349C0.477327 3.90942 0.313264 4.05395 0.203889 4.25708C0.157014 4.35083 0.129671 4.44458 0.121858 4.53833C0.114046 4.63208 0.117952 4.72583 0.133577 4.81958Z" class="fill-inherit"/>
@@ -39,7 +39,9 @@
         <p class="whitespace-pre-wrap text-sm truncate">{{message.text}}</p>     
         <!-- <h2>{{message.time}}</h2> -->
     </Message>
-    
+    <div ref="end" class="test w-full h-10">
+
+    </div>
     </div>
    
   </div>
@@ -78,12 +80,14 @@ export default {
             userMessages: [],
             tempMsg: "",
             encryptor: new JSEncrypt(),
+            scrollToEnd: null,
             encodedMsg: ""
             // rsaKey: new NodeRSA()
         }
     },
     mounted(){
         // trash checking for nulls
+        this.scrollToEnd = this.$refs.end
         this.username = localStorage.getItem('username').replace('"','').replace('"','');
         
         if(this.reciverName == null){
@@ -130,31 +134,44 @@ export default {
                 const userMessages = this.messages
                     ?.find(item => item.username === this.store.getReciver())
                     ?.messages.filter(msg => msg.sender !== this.username);
+
+                const reciverMessages = this.messages
+                    ?.find(item => item.username === this.store.getReciver())
+                    ?.messages.filter(msg => msg.sender === this.username);
                 
-                // console.log(this.messages);
                 const value = JSON.parse(localStorage.getItem("messages"));
-                const combinedMessages = userMessages != null ? [...userMessages, ...value] : value;
+                const combinedMessages = userMessages != null ? [...value, ...userMessages] : [];
                 
-                const combinedSortedMessages = combinedMessages.sort((a, b) => a.time - b.time);
+                const combinedSortedMessages = combinedMessages?.sort((a, b) => a.time - b.time);
                 const removedMessages = combinedSortedMessages.filter(message => typeof message.time !== 'undefined' && Number.isInteger(message.time));
                 let filteredMessages = removedMessages.sort((a, b) => a.time - b.time);
                 this.decodeMessage(filteredMessages)
+                console.log(this.encodedMsg);
                 filteredMessages = this.encodedMsg
                 for (let index = 0; index < filteredMessages?.length; index++) { 
                     let temp = filteredMessages[index]
                     if(temp?.sender){
                          let isOutCome = temp.receiver === this.store.getReciver()
 
-                        if(this.store.getReciver() == temp?.receiver || temp.sender == this.store.getReciver()){
-                            // console.log(temp?.message);
+                        if(this.store.getUsername() == temp?.receiver && temp.sender == this.store.getUsername() && this.store.getReciver() == temp?.receiver){
+                            console.log(this.store.getUsername(), temp?.receiver);
+                            decodedArray.push({"text": temp.message, "time": new Date(parseInt(temp.time) + new Date().getTimezoneOffset() * 60 * 1000).toLocaleString("en-US", { month: "short", day: 'numeric', hour: "numeric", minute: "numeric", hour12: true,}), "isWatched": false, "isSended": true, "inMessage": !isOutCome, "sender": temp.sender, "receiver": temp.receiver})
+                        }else if((this.store.getUsername() == temp?.receiver && temp.sender != this.store.getUsername()) || (temp.sender == this.store.getUsername() && temp?.receiver == this.store.getReciver())){
                             decodedArray.push({"text": temp.message, "time": new Date(parseInt(temp.time) + new Date().getTimezoneOffset() * 60 * 1000).toLocaleString("en-US", { month: "short", day: 'numeric', hour: "numeric", minute: "numeric", hour12: true,}), "isWatched": false, "isSended": true, "inMessage": !isOutCome, "sender": temp.sender, "receiver": temp.receiver})
                         }
+                       // }else if((this.store.getReciver() == temp?.receiver  && temp.sender != this.store.getReciver()) || (this.store.getUsername() == temp?.receiver && this.store.getUsername() != temp.sender)){
+                        //     decodedArray.push({"text": temp.message, "time": new Date(parseInt(temp.time) + new Date().getTimezoneOffset() * 60 * 1000).toLocaleString("en-US", { month: "short", day: 'numeric', hour: "numeric", minute: "numeric", hour12: true,}), "isWatched": false, "isSended": true, "inMessage": !isOutCome, "sender": temp.sender, "receiver": temp.receiver})
+                        // }
+                        // else if(this.store.getUsername() == temp?.receiver && temp.sender == this.store.getReciver()){
+                        //     decodedArray.push({"text": temp.message, "time": new Date(parseInt(temp.time) + new Date().getTimezoneOffset() * 60 * 1000).toLocaleString("en-US", { month: "short", day: 'numeric', hour: "numeric", minute: "numeric", hour12: true,}), "isWatched": false, "isSended": true, "inMessage": !isOutCome, "sender": temp.sender, "receiver": temp.receiver})
+                        // }
                     }
                     
                 }
                 
                 if(this.reciverPublicKey != null && this.username != null){
                     this.vMessages = decodedArray;
+                    
                 }else{
                   
                     console.log(this.reciverName != null, "don't display");
@@ -174,7 +191,7 @@ export default {
        sendMsg() {
             if (this.username !== null && this.reciverName !== null) {
                 // just some variables for future features
-                const serializedKey = localStorage.getItem('privateKey');
+                // const serializedKey = localStorage.getItem('privateKey');
                 const serializedToken = localStorage.getItem('token');
                 const publicKey = localStorage.getItem('publicKey').replace('"','').replace('"','');
                 const username = localStorage.getItem('username');
@@ -186,8 +203,11 @@ export default {
                 // Send the message to the server
                     this.sendMessage(this.store.getReciver(), this.tempMsg);
                     this.inputValue = "";
+                    this.scrollToEnd.scrollIntoView({ behavior: 'smooth' });
                 }
+                
             }
+            
             },
 
 
